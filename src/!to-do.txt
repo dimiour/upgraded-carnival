@@ -1,0 +1,24 @@
+TODO
+
+health and damage specific to bullets:
+    - make an enumeration or list of enumerations for the 
+      classification of objects, possibly renaming them to entities
+    - possibly change the physics functions depending on the
+      class of that entity including absorption and drag
+    - add health variable to player/enemy class enum
+
+weapon changeability:
+    - ponder possibilities for weapons
+    - add cooldown for shooting
+
+
+DONE
+
+weapon changeability:
+    - create variable (Weapon, Weapon) with boolean to indicate 
+      which is in use
+    - build a way to indicate which weapon is equipped
+
+compartmentalize:
+    - create a function in the game implementation for the user interactions
+    - switch the assignment of variables in the beginning of the loop into functions for each
