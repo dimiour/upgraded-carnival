@@ -4,7 +4,7 @@ pub fn window_conf() -> Conf {
     Conf {
         window_height: 2000,
         window_width: 1000,
-        window_resizable: false,
+        window_resizable: true,
         window_title: String::from("Macroquad Hacking"),
         ..Default::default()
     }

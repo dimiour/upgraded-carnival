@@ -1,35 +1,16 @@
-use crate::object::*;
 use crate::screen_mouse_position;
-use macroquad::prelude::*;
+use crate::object::*;
+use crate::weapons::*;
 
+use macroquad::prelude::*;
 use std::f64::INFINITY;
+
 
 const TPS: f64 = 60.0;
 pub const TICK_LENGTH: f64 = 1.0/TPS;
 
-pub const SNIPER: Weapon = Weapon {
-    recoil_scale: 0.02,
-    max_stretch: 0.05,
-    min_stretch: 0.025,
-    speed_scale: 0.08,
-    bullet_size: 0.008,
-    gun_size: 0.02,
-    fade_time: 1.0,
-};
-
-#[derive(Copy, Clone)]
-pub struct Weapon {
-    pub gun_size: f32, 
-    recoil_scale: f32, 
-    pub max_stretch: f32,
-    pub min_stretch: f32, 
-    speed_scale: f32,
-    bullet_size: f32,
-    fade_time: f64, 
-}
 
 //GAME
-
 #[derive(Clone)]
 pub struct Game {
     pub interaction: Option<(f64, Vec2, bool)>,
@@ -84,8 +65,10 @@ impl Game {
         }
     }
 
-    pub fn interaction(&mut self, weapon: Weapon) {
+    pub fn interaction(&mut self, loadout: (Weapon, Weapon), equipped: bool) -> bool {
         if let Some((click_time, click_position, true)) = self.interaction {
+            let weapon = if equipped {loadout.0} else {loadout.1};
+
             self.interaction = None;
             
             let release = 
@@ -101,7 +84,8 @@ impl Game {
                 for rotation in -1..2 {
                 //if (get_time()/get_frame_time() as f64).floor()%5.0 == 0.0 {
                      self.map.push(Object::new(
-                        self.center()+initial_bullet_position,//+bullet_displacement*rotation as f32,
+                        self.center()+initial_bullet_position
+                        +bullet_displacement*rotation as f32,
                         velocity+(release*weapon.speed_scale), //
                         weapon.bullet_size,
                         weapon.fade_time
@@ -109,8 +93,14 @@ impl Game {
                 }
 
                 self.map[self.player].velocity -= release*weapon.recoil_scale;
+            } else if get_time()-click_time < 0.6 {
+                return !equipped
             }
+
+            return equipped
         }
+
+        equipped
     }
 
     pub fn draw_map(&self) {
@@ -122,7 +112,7 @@ impl Game {
                     1.0, 
                     object.size*50.0-0.5, 
                     0.5-object.size*50.0, 
-                    if object.fade > 1.0 {1.0} else {object.fade as f32}
+                    if object.fade > 0.25 {1.0} else {object.fade as f32/0.25}
                 ) 
             };
             

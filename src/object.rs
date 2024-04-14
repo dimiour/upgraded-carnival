@@ -1,7 +1,7 @@
 use macroquad::prelude::*;
 use std::f32::consts::PI;
 
-const DRAG: f32 = 0.99;
+const DRAG: f32 = 0.98;
 const ABSORBTION: f32 = 0.1;
 
 #[derive(Clone, Copy)]

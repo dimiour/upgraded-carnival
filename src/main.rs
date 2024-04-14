@@ -1,8 +1,7 @@
-mod object;
-mod game;
+mod object; mod game; mod window; mod weapons;
 use game::*;
-mod window;
 use window::*;
+use weapons::*;
 
 use macroquad::prelude::*;
 
@@ -16,7 +15,7 @@ async fn game() {
     
     let mut game = Game::new();
 
-    let loadout = (SNIPER, SNIPER);
+    let loadout = (LEAP, SNIPER);
     let mut equipped = true;
 
     loop {
@@ -29,8 +28,8 @@ async fn game() {
         set_window(center);
         
         //background
-        for x in -4..5 {
-            for y in -4..5 {
+        for x in -9..10 {
+            for y in -9..10 {
                 draw_circle(0.1*x as f32,0.1*y as f32,0.003,WHITE);
             }
         }
@@ -80,7 +79,7 @@ async fn game() {
         while time >= last_tick+TICK_LENGTH {
             game.tick();
 
-            game.interaction(weapon);
+            equipped = game.interaction(loadout, equipped);
 
             last_tick += TICK_LENGTH;
         }
