@@ -6,7 +6,7 @@ use macroquad::prelude::*;
 use std::f64::INFINITY;
 
 
-const TPS: f64 = 60.0;
+const TPS: f64 = 100.0;
 pub const TICK_LENGTH: f64 = 1.0/TPS;
 
 
@@ -67,6 +67,7 @@ impl Game {
 
     pub fn interaction(&mut self, loadout: (Weapon, Weapon), equipped: bool) -> bool {
         if let Some((click_time, click_position, true)) = self.interaction {
+            let time = get_time()-click_time;
             let weapon = if equipped {loadout.0} else {loadout.1};
 
             self.interaction = None;
@@ -76,24 +77,10 @@ impl Game {
                 .clamp_length(0.0, weapon.max_stretch);
             
             if release.length() > weapon.min_stretch {
-                let velocity = self.map[self.player].velocity;
-                let initial_bullet_position = release.clamp_length(weapon.gun_size, weapon.gun_size);
-                
-                let bullet_displacement = initial_bullet_position.perp()*0.8;
-                
-                for rotation in -1..2 {
-                //if (get_time()/get_frame_time() as f64).floor()%5.0 == 0.0 {
-                     self.map.push(Object::new(
-                        self.center()+initial_bullet_position
-                        +bullet_displacement*rotation as f32,
-                        velocity+(release*weapon.speed_scale), //
-                        weapon.bullet_size,
-                        weapon.fade_time
-                    ));
+                if time >= weapon.fire_rate {
+                    self.perform_shot(weapon, release)
                 }
-
-                self.map[self.player].velocity -= release*weapon.recoil_scale;
-            } else if get_time()-click_time < 0.6 {
+            } else if time < weapon.fire_rate {
                 return !equipped
             }
 
@@ -136,5 +123,25 @@ impl Game {
     
     pub fn center(&self) -> Vec2 {
         self.map[self.player].position
+    }
+
+    fn perform_shot(&mut self, weapon: Weapon, release: Vec2) {
+        let velocity = self.map[self.player].velocity;
+        let initial_bullet_position = release.clamp_length(weapon.gun_size, weapon.gun_size);
+                    
+        let bullet_displacement = initial_bullet_position.perp()*0.8;
+                    
+        for rotation in -1..2 {
+        //if (get_time()/get_frame_time() as f64).floor()%5.0 == 0.0 {
+            self.map.push(Object::new(
+                self.center()+initial_bullet_position
+                +bullet_displacement*rotation as f32,
+                velocity+(release*weapon.speed_scale), //
+                weapon.bullet_size,
+                weapon.fade_time
+            ));
+        }
+
+        self.map[self.player].velocity -= release*weapon.recoil_scale;
     }
 }

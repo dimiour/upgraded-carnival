@@ -1,11 +1,12 @@
 pub const SNIPER: Weapon = Weapon {
-    recoil_scale: 0.01,
+    recoil_scale: 0.01, // scale depending on the stretch of the gun
     max_stretch: 0.05,
     min_stretch: 0.025,
     speed_scale: 0.2,
     bullet_size: 0.014,
     gun_size: 0.02,
     fade_time: 1.0,
+    fire_rate: 0.5,
 };
 
 pub const LEAP: Weapon = Weapon {
@@ -16,6 +17,7 @@ pub const LEAP: Weapon = Weapon {
     bullet_size: 0.009,
     gun_size: 0.02,
     fade_time: 0.2,
+    fire_rate: 0.2,
 };
 
 #[derive(Copy, Clone)]
@@ -27,4 +29,5 @@ pub struct Weapon {
     pub speed_scale: f32,
     pub bullet_size: f32,
     pub fade_time: f64, 
+    pub fire_rate: f64,
 }

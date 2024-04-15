@@ -1,7 +1,8 @@
-mod object; mod game; mod window; mod weapons;
+mod object; mod game; mod window; mod weapons; mod transitions;
 use game::*;
 use window::*;
 use weapons::*;
+use transitions::*;
 
 use macroquad::prelude::*;
 
@@ -19,6 +20,7 @@ async fn game() {
     let mut equipped = true;
 
     loop {
+        clear_background(DARKBROWN);
         print_stats(game.map.len());
 
         let center = game.center();
@@ -49,11 +51,14 @@ async fn game() {
 
         if is_mouse_button_down(MouseButton::Left) {
             let click_position = game.interaction.unwrap().1+ui_position(center);
+            let time_since_click = get_time()-game.interaction.unwrap().0;
+            let fade_in = half_arc(time_since_click/weapon.fire_rate);
+            let fade_color = Color::new(1.0-fade_in, fade_in, 0.0, 1.0);
             
-            if click_position.distance(mouse_position) > weapon.min_stretch {
+            //if click_position.distance(mouse_position) > weapon.min_stretch {
                 let capped_position = 
                     (mouse_position-click_position)
-                    .clamp_length_max(weapon.max_stretch)
+                    .clamp_length_max(weapon.max_stretch*fade_in)
                     +click_position;
                 
                 draw_line(
@@ -62,12 +67,12 @@ async fn game() {
                     capped_position.x, 
                     capped_position.y, 
                     0.02, 
-                    MAGENTA
+                    fade_color
                 );
                 
-                draw_circle(capped_position.x, capped_position.y, 0.01, MAGENTA);
-            }
-            draw_circle(click_position.x, click_position.y, 0.01, MAGENTA);
+                draw_circle(capped_position.x, capped_position.y, 0.01, fade_color);
+            //}
+            draw_circle(click_position.x, click_position.y, 0.01, fade_color);
         }
 
         if is_mouse_button_released(MouseButton::Left) {
