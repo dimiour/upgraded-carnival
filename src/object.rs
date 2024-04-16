@@ -50,8 +50,8 @@ impl Object {
             let unit_position_difference = position_difference.clamp_length(1.0, 1.0);
             let combined_mass = self.size.powf(2.0) + rhs.size.powf(2.0);
             self.velocity += (
-                correspondance(self.velocity, unit_position_difference)+
-                correspondance(-rhs.velocity, unit_position_difference)
+                calculate_bounce(self.velocity, unit_position_difference)+
+                calculate_bounce(-rhs.velocity, unit_position_difference)
             )*rhs.size.powf(2.0)/combined_mass*ABSORBTION;
         } 
         
@@ -59,7 +59,7 @@ impl Object {
     }
 }
 
-fn correspondance(velocity: Vec2, direction_vector: Vec2) -> Vec2 {
+fn calculate_bounce(velocity: Vec2, direction_vector: Vec2) -> Vec2 {
     let angle_difference: f32 = velocity.angle_between(-direction_vector);
 
     if angle_difference.abs() < PI*0.5 {
