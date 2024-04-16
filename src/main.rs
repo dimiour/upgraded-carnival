@@ -19,9 +19,11 @@ async fn game() {
     let loadout = (LEAP, SNIPER);
     let mut equipped = true;
 
+    let mut transitions: Vec<Transition> = vec![];
+
     loop {
         clear_background(DARKBROWN);
-        print_stats(game.map.len());
+        //print_stats(game.map.len());
 
         let center = game.center();
         let screen_mouse_position = screen_mouse_position();
@@ -84,9 +86,19 @@ async fn game() {
         while time >= last_tick+TICK_LENGTH {
             game.tick();
 
-            equipped = game.interaction(loadout, equipped);
-
+            let (new_equipped, new_transition) = game.interaction(loadout, equipped);
+            equipped = new_equipped;
+            if let Some(transition) = new_transition {
+                transitions.insert(0, transition);
+            }
+            
             last_tick += TICK_LENGTH;
+        }
+
+        for index in 0..transitions.len() {
+            if transitions[index].draw(center) {
+                transitions.remove(index);
+            }
         }
 
         //new frame

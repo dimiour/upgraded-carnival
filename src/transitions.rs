@@ -1,5 +1,8 @@
-use std::{f32::consts::PI, fmt::Result};
+use std::f32::consts::PI;
 use macroquad::prelude::*;
+use crate::window::*;
+
+const TRANSITION_SPEED: f64 = 0.25;
 
 pub fn arc(t: f64) -> f32 {
     if t < 1.0 {
@@ -17,6 +20,7 @@ pub fn half_arc(t: f64) -> f32 {
     }
 }
 
+#[derive(Debug)]
 pub struct Transition {
     pub class: TransitionClass,
     start_time: f64,
@@ -24,7 +28,7 @@ pub struct Transition {
 }
 
 impl Transition {
-    fn new(class: TransitionClass, position: Vec2) -> Self {
+    pub fn new(class: TransitionClass, position: Vec2) -> Self {
         Self {
             class,
             start_time: get_time(),
@@ -32,36 +36,43 @@ impl Transition {
         }
     }
 
-    fn draw(&mut self) {
+    pub fn draw(&mut self, center: Vec2) -> bool {
         let time = get_time()-self.start_time;
 
-        if time < 1.0 {
+        if time < TRANSITION_SPEED {
             match self.class {
                 TransitionClass::Release(release_position) => {
+                    
                     let relative_position = release_position-self.position;
-                    let release = relative_position*half_arc(time)+self.position;
+                    let position = self.position+ui_position(center);
+                    let release = relative_position*(1.0-half_arc(time/TRANSITION_SPEED))+position;
                     
                     draw_line(
-                        self.position.x, 
-                        self.position.y, 
+                        position.x, 
+                        position.y, 
                         release.x, 
                         release.y, 
                         0.02, 
-                        MAGENTA
+                        GREEN
                     );
                     
-                    draw_circle(release.x, release.y, 0.01, MAGENTA);
-                    draw_circle(self.position.x, self.position.y, 0.01, MAGENTA);
+                    draw_circle(release.x, release.y, 0.01, GREEN);
+                    draw_circle(position.x, position.y, 0.01, GREEN);
                 },
 
                 TransitionClass::Tap => {
-                    draw_circle(self.position.x, self.position.y, arc(time)*0.2, MAGENTA)
+                    let position = self.position+ui_position(center);
+                    draw_circle(position.x, position.y, arc(time/TRANSITION_SPEED)*0.03, BLUE)
                 },
             }
+            false
+        } else {
+            true
         }
     }
 }
 
+#[derive(Debug)]
 pub enum TransitionClass {
     Tap,
     Release(Vec2),

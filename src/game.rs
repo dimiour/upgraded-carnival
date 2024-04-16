@@ -1,6 +1,7 @@
 use crate::screen_mouse_position;
 use crate::object::*;
 use crate::weapons::*;
+use crate::transitions::*;
 
 use macroquad::prelude::*;
 use std::f64::INFINITY;
@@ -65,7 +66,7 @@ impl Game {
         }
     }
 
-    pub fn interaction(&mut self, loadout: (Weapon, Weapon), equipped: bool) -> bool {
+    pub fn interaction(&mut self, loadout: (Weapon, Weapon), equipped: bool) -> (bool, Option<Transition>) {
         if let Some((click_time, click_position, true)) = self.interaction {
             let time = get_time()-click_time;
             let weapon = if equipped {loadout.0} else {loadout.1};
@@ -80,14 +81,15 @@ impl Game {
                 if time >= weapon.fire_rate {
                     self.perform_shot(weapon, release)
                 }
+                return (equipped, Some(Transition::new(TransitionClass::Release(release+click_position), click_position)))
             } else if time < weapon.fire_rate {
-                return !equipped
+                return (!equipped, Some(Transition::new(TransitionClass::Tap, click_position)))
             }
 
-            return equipped
+            return (equipped, None)
         }
 
-        equipped
+        (equipped, None)
     }
 
     pub fn draw_map(&self) {
