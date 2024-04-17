@@ -7,7 +7,7 @@ use macroquad::prelude::*;
 use std::f64::INFINITY;
 
 
-const TPS: f64 = 100.0;
+const TPS: f64 = 60.0;
 pub const TICK_LENGTH: f64 = 1.0/TPS;
 
 
@@ -82,7 +82,7 @@ impl Game {
                     self.perform_shot(weapon, release)
                 }
                 return (equipped, Some(Transition::new(TransitionClass::Release(release+click_position), click_position)))
-            } else if time < weapon.fire_rate {
+            } else if time < 0.3 {
                 return (!equipped, Some(Transition::new(TransitionClass::Tap, click_position)))
             }
 
