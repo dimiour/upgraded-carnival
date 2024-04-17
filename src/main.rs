@@ -16,7 +16,7 @@ async fn game() {
     
     let mut game = Game::new();
 
-    let loadout = (LEAP, SNIPER);
+    let loadout = (ROCKET, SNIPER);
     let mut equipped = true;
 
     let mut transitions: Vec<Transition> = vec![];

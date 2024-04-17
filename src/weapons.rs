@@ -20,6 +20,17 @@ pub const LEAP: Weapon = Weapon {
     fire_rate: 0.2,
 };
 
+pub const ROCKET: Weapon = Weapon {
+    recoil_scale: -0.1,
+    max_stretch: 0.05,
+    min_stretch: 0.025,
+    speed_scale: 0.05,
+    bullet_size: 0.01,
+    gun_size: -0.01,
+    fade_time: 0.5,
+    fire_rate: 0.3,
+};
+
 #[derive(Copy, Clone)]
 pub struct Weapon {
     pub gun_size: f32, 
