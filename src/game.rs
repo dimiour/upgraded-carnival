@@ -4,6 +4,7 @@ use crate::weapons::*;
 use crate::transitions::*;
 
 use macroquad::prelude::*;
+use std::f32::consts::PI;
 use std::f64::INFINITY;
 
 
@@ -131,14 +132,33 @@ impl Game {
         let velocity = self.map[self.player].velocity;
         let initial_bullet_position = release.clamp_length(weapon.gun_size, weapon.gun_size);
                     
-        let bullet_displacement = initial_bullet_position.perp()*0.8;
-                    
-        for rotation in -1..2 {
+        for spread in 0..weapon.spread_count {
         //if (get_time()/get_frame_time() as f64).floor()%5.0 == 0.0 {
+            let offset = 
+                spread as f32
+                -((weapon.spread_count/2) as f32)
+                -0.5*(weapon.spread_count%2) as f32;
+            let bullet_velocity = (release*weapon.speed_scale);
+            
+            let velocity_angle = 
+            if bullet_velocity.x == 0.0 {
+                if bullet_velocity.y > 0.0 {
+                    PI/2.0
+                } else {
+                    -PI/2.0
+                }
+            } else if bullet_velocity.x > 0.0 {
+                (bullet_velocity.y/bullet_velocity.x).atan()
+            } else {
+                (bullet_velocity.y/bullet_velocity.x).atan() + PI
+            };
+            
+            
+            
+            let bullet_angle = Vec2::from_angle(weapon.angle_spread*offset+velocity_angle);
             self.map.push(Object::new(
-                self.center()+initial_bullet_position
-                +bullet_displacement*rotation as f32,
-                velocity+(release*weapon.speed_scale), //
+                self.center()+bullet_angle*initial_bullet_position.length(),
+                velocity+bullet_angle*bullet_velocity.length(), //
                 weapon.bullet_size,
                 weapon.fade_time
             ));
