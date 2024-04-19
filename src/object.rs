@@ -2,7 +2,7 @@ use macroquad::prelude::*;
 use std::f32::consts::PI;
 
 const DRAG: f32 = 0.98;
-const ABSORBTION: f32 = 0.1;
+const ABSORBTION: f32 = 0.2;
 
 #[derive(Clone, Copy)]
 pub struct Object {
@@ -24,21 +24,19 @@ impl Object {
 
         let self_border = -self.size+1.0;
         if self.position.y > self_border {
-            self.velocity.y = -self.velocity.y.abs()
-        } else {
-            //self.velocity.y += 0.0000001;
+            self.velocity.y -= (self.position.y-self_border)*0.1;
         }
 
         if self.position.y < -self_border {
-            self.velocity.y = self.velocity.y.abs()
+            self.velocity.y += (self.position.y-self_border)*0.1;
         }
 
         if self.position.x > self_border {
-            self.velocity.x = -self.velocity.x.abs()
+            self.velocity.x -= (self.position.x-self_border)*0.1;
         }
 
         else if self.position.x < -self_border {
-            self.velocity.x = self.velocity.x.abs()
+            self.velocity.x += (self.position.x-self_border)*0.1;
         }
 
         
