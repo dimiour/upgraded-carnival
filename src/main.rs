@@ -37,8 +37,8 @@ async fn game() {
                 draw_circle(0.1*x as f32,0.1*y as f32,0.003,WHITE);
             }
         }
-        
-        draw_rectangle_lines(-1.0, -1.0, 2.0, 2.0, 0.01, WHITE);
+        let size = object::BORDER_SIZE;//+(get_time() as f32*0.1).sin()*0.4;
+        draw_rectangle_lines(-size, -size, size*2.0, size*2.0, 0.01, WHITE);
 
         //draw map
         game.draw_map();

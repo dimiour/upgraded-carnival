@@ -3,6 +3,7 @@ use std::f32::consts::PI;
 
 const DRAG: f32 = 0.98;
 const ABSORBTION: f32 = 0.2;
+pub const BORDER_SIZE: f32 = 0.2;
 
 #[derive(Clone, Copy)]
 pub struct Object {
@@ -22,21 +23,21 @@ impl Object {
         self.velocity *= Vec2::splat(DRAG).powf(1.0-(0.02-self.size).powf(0.1));
         
 
-        let self_border = -self.size+1.0;
+        let self_border = -self.size+BORDER_SIZE;//+(get_time() as f32*0.1).sin()*0.4;
         if self.position.y > self_border {
-            self.velocity.y -= (self.position.y-self_border)*0.1;
+            self.velocity.y -= (self.position.y-self_border)*ABSORBTION;
         }
 
         if self.position.y < -self_border {
-            self.velocity.y += (self.position.y-self_border)*0.1;
+            self.velocity.y -= (self.position.y+self_border)*ABSORBTION;
         }
 
         if self.position.x > self_border {
-            self.velocity.x -= (self.position.x-self_border)*0.1;
+            self.velocity.x -= (self.position.x-self_border)*ABSORBTION;
         }
 
         else if self.position.x < -self_border {
-            self.velocity.x += (self.position.x-self_border)*0.1;
+            self.velocity.x -= (self.position.x+self_border)*ABSORBTION;
         }
 
         
