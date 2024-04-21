@@ -5,17 +5,35 @@ const DRAG: f32 = 0.98;
 const ABSORBTION: f32 = 0.2;
 pub const BORDER_SIZE: f32 = 0.2;
 
-#[derive(Clone, Copy)]
+static mut NEW_OBJECT_ID: usize = 0;
+
+fn new_object_id() -> usize {
+    unsafe {
+        NEW_OBJECT_ID += 1;
+        NEW_OBJECT_ID
+    }
+}
+
+#[derive(Copy, Clone)]
+pub enum ObjectClass {
+    Bullet,
+    Wall,
+    Player,
+}
+
+#[derive(Clone)]
 pub struct Object {
     pub velocity: Vec2,
     pub position: Vec2,
     pub size: f32,
     pub fade: f64,
+    pub id: usize,
+    pub class: ObjectClass,
 }
 
 impl Object {
-    pub fn new(position: Vec2, velocity: Vec2, size: f32, fade: f64) -> Self {
-        Self { position, velocity, size, fade }
+    pub fn new(position: Vec2, velocity: Vec2, size: f32, fade: f64, class: ObjectClass) -> Self {
+        Self { position, velocity, size, fade, id: new_object_id(), class }
     }
 
     pub fn update(&mut self) {
@@ -68,3 +86,4 @@ fn calculate_bounce(velocity: Vec2, direction_vector: Vec2) -> Vec2 {
         Vec2::ZERO
     }
 }
+

@@ -16,7 +16,7 @@ async fn game() {
     
     let mut game = Game::new();
 
-    let loadout = (ROCKET, SNIPER);
+    let loadout = (BUILDER, SNIPER);
     let mut equipped = true;
 
     let mut transitions: Vec<Transition> = vec![];
@@ -55,25 +55,10 @@ async fn game() {
             let click_position = game.interaction.unwrap().1+ui_position(center);
             let time_since_click = get_time()-game.interaction.unwrap().0;
             let fade_in = half_arc(time_since_click/weapon.fire_rate);
-            let fade_color = Color::new(1.0-fade_in, fade_in, 0.0, 1.0);
-            
-            //if click_position.distance(mouse_position) > weapon.min_stretch {
-                let capped_position = 
-                    (mouse_position-click_position)
-                    .clamp_length_max(weapon.max_stretch*fade_in)
-                    +click_position;
-                
-                draw_line(
-                    click_position.x, 
-                    click_position.y, 
-                    capped_position.x, 
-                    capped_position.y, 
-                    0.02, 
-                    fade_color
-                );
-                
-                draw_circle(capped_position.x, capped_position.y, 0.01, fade_color);
-            //}
+            let capped_position = (mouse_position-click_position).clamp_length_max(weapon.max_stretch*fade_in)+click_position;
+            let fade_color = if fade_in == 1.0 && (mouse_position-click_position).length() > weapon.min_stretch {GREEN} else {RED}; 
+            draw_line(click_position.x, click_position.y, capped_position.x, capped_position.y, 0.02, fade_color);
+            draw_circle(capped_position.x, capped_position.y, 0.01, fade_color);
             draw_circle(click_position.x, click_position.y, 0.01, fade_color);
         }
 

@@ -7,16 +7,18 @@ use macroquad::prelude::*;
 use std::f32::consts::PI;
 use std::f64::INFINITY;
 
-
 const TPS: f64 = 60.0;
 pub const TICK_LENGTH: f64 = 1.0/TPS;
+
+const OBJECT_FADE_SPEED: f64 = 0.25;
 
 
 //GAME
 #[derive(Clone)]
 pub struct Game {
     pub interaction: Option<(f64, Vec2, bool)>,
-    pub player: usize,
+    pub player_id: usize,
+    pub player_index: usize,
     pub map: Vec<Object>,
 }
 
@@ -24,18 +26,29 @@ impl Game {
     pub fn new() -> Self {
         let mut game: Self = Self {
             interaction: None,
-            player: 0,
+            player_id: 1,
+            player_index: 0,
             map: vec![]
         };
-    
+
+        game.player_index = game.map.len();
+        game.map.push(Object::new(
+            vec2(0.0, 0.0), 
+            vec2(0.0, 0.0), 
+            0.02, 
+            INFINITY,
+            ObjectClass::Player,
+        ));
+        
         for x in -3..4 {
             for y in -3..4 {
-                game.player = game.map.len();
+                
                 game.map.push(Object::new(
                     vec2(0.05*x as f32, 0.05*y as f32), 
                     vec2(0.0, 0.0), 
                     0.02, 
-                    INFINITY
+                    10.0,
+                    ObjectClass::Wall
                 ));
             }
         }
@@ -64,6 +77,12 @@ impl Game {
 
         for object_index in delete_list.into_iter() {
             self.map.remove(object_index);
+        }
+
+        for object_index in 0..self.map.len() {
+            if self.map[object_index].id == self.player_id {
+                self.player_index = object_index;
+            }
         }
     }
 
@@ -94,51 +113,48 @@ impl Game {
     }
 
     pub fn draw_map(&self) {
-        for (index, object) in self.map.iter().enumerate() {
-            let mut color = if self.player == index {
-                BLUE
-            } else {
-                Color::new(
-                    1.0, 
-                    object.size*50.0-0.5, 
-                    0.5-object.size*50.0, 
-                    if object.fade > 0.25 {1.0} else {object.fade as f32/0.25}
-                ) 
-            };
-            
-            if object.size > 0.015 {
-                draw_circle(object.position.x, object.position.y, object.size, color);
-                color.r -= 0.1;color.g -= 0.1;color.b -= 0.1;
-                draw_circle(object.position.x, object.position.y, object.size*0.8, color)
-            } else {
-                draw_poly_lines(
-                    object.position.x, 
-                    object.position.y,
-                    3,
-                    object.size, 
-                    (get_time() as f32%1.0)*360.0,
-                    0.004,
-                    color
-                );
-            }  
+        for object in self.map.iter() {
+            match object.class {
+                ObjectClass::Bullet => {
+                    draw_poly_lines(
+                        object.position.x, 
+                        object.position.y,
+                        3,
+                        object.size, 
+                        (get_time() as f32%1.0)*360.0,
+                        0.004,
+                        fade_color(RED, object.fade),
+                    );
+                },
+
+                class => {
+                    let mut color = match class {
+                        ObjectClass::Player => if object.id == self.player_id {BLUE} else {RED}
+                        _ => GRAY
+                    };
+                    draw_circle(object.position.x, object.position.y, object.size, fade_color(color, object.fade));
+                    color.r -= 0.1;color.g -= 0.1;color.b -= 0.1;
+                    draw_circle(object.position.x, object.position.y, object.size*0.8, fade_color(color, object.fade))
+                },
+            }
         }
     }
     
     pub fn center(&self) -> Vec2 {
-        self.map[self.player].position
+        self.map[self.player_index].position
     }
 
     fn perform_shot(&mut self, weapon: Weapon, release: Vec2) {
-        let velocity = self.map[self.player].velocity;
+        let velocity = self.map[self.player_index].velocity;
         let initial_bullet_position = release.clamp_length(weapon.gun_size, weapon.gun_size);
                     
         for spread in 0..weapon.spread_count {
-        //if (get_time()/get_frame_time() as f64).floor()%5.0 == 0.0 {
             let offset = 
                 spread as f32
                 -((weapon.spread_count/2) as f32)
                 -0.5*(weapon.spread_count%2) as f32;
-            let bullet_velocity = (release*weapon.speed_scale);
+            
+            let bullet_velocity = release*weapon.speed_scale;
             
             let velocity_angle = 
             if bullet_velocity.x == 0.0 {
@@ -160,10 +176,16 @@ impl Game {
                 self.center()+bullet_angle*initial_bullet_position.length(),
                 velocity+bullet_angle*bullet_velocity.length(), //
                 weapon.bullet_size,
-                weapon.fade_time
+                weapon.fade_time,
+                weapon.bullet_class,
             ));
         }
 
-        self.map[self.player].velocity -= release*weapon.recoil_scale;
+        self.map[self.player_index].velocity -= release*weapon.recoil_scale;
     }
+}
+
+fn fade_color(mut color: Color, fade: f64) -> Color {
+    color.a = if fade > OBJECT_FADE_SPEED {1.0} else {fade as f32};
+    color
 }
