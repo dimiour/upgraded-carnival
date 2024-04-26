@@ -1,5 +1,13 @@
 use macroquad::prelude::*;
 
+static mut CAMERA: Vec2 = Vec2 {x: 0.0, y: 0.0};
+
+pub fn ui_position() -> Vec2 {
+    unsafe {
+        CAMERA
+    }
+}
+
 pub fn window_conf() -> Conf {
     Conf {
         window_height: 2000,
@@ -10,12 +18,7 @@ pub fn window_conf() -> Conf {
     }
 }
 
-pub fn real_mouse_position(center: Vec2) -> Vec2 {screen_mouse_position()+ui_position(center)}
-
-pub fn ui_position(center: Vec2) -> Vec2 {
-    
-    center-window_size()*0.5
-}
+pub fn real_mouse_position() -> Vec2 {screen_mouse_position()+ui_position()}
 
 pub fn screen_mouse_position() -> Vec2 {(mouse_position_local()+Vec2::ONE)*0.5*window_size()}
 
@@ -36,11 +39,15 @@ pub fn set_window(center: Vec2) {
             .offset(center-window_size*0.5);
 
     set_camera(&Camera2D::from_display_rect(window_rect));
+    unsafe {
+        CAMERA = center-window_size*0.5;
+    }
 }
 
-// pub fn print_stats(len: usize) {
-//     if (get_time()/get_frame_time() as f64).floor()%200.0 == 0.0 {
-//         println!("objects: {}", len);
-//         println!("fps: {}", (1.0/get_frame_time()).floor());
-//     }
-// }
+/*pub fn print_stats(len: usize) {
+    if (get_time()/get_frame_time() as f64).floor()%200.0 == 0.0 {
+        //println!("objects: {}", len);
+        //println!("fps: {}", (1.0/get_frame_time()).floor());
+        //unsafe {get_scene()}
+    }
+}*/

@@ -2,8 +2,8 @@ use macroquad::prelude::*;
 use std::f32::consts::PI;
 
 const DRAG: f32 = 0.98;
-const ABSORBTION: f32 = 0.2;
-pub const BORDER_SIZE: f32 = 0.2;
+const ABSORBTION: f32 = 0.1;
+pub const BORDER_SIZE: f32 = 1.0;
 
 static mut NEW_OBJECT_ID: usize = 0;
 
@@ -40,25 +40,24 @@ impl Object {
         self.position += self.velocity;
         self.velocity *= Vec2::splat(DRAG).powf(1.0-(0.02-self.size).powf(0.1));
         
+        if let ObjectClass::Player = self.class {
+            let self_border = -self.size+BORDER_SIZE;//+(get_time() as f32*0.1).sin()*0.4;
+            if self.position.y > self_border {
+                self.velocity.y -= (self.position.y-self_border)*ABSORBTION;
+            }
 
-        let self_border = -self.size+BORDER_SIZE;//+(get_time() as f32*0.1).sin()*0.4;
-        if self.position.y > self_border {
-            self.velocity.y -= (self.position.y-self_border)*ABSORBTION;
+            if self.position.y < -self_border {
+                self.velocity.y -= (self.position.y+self_border)*ABSORBTION;
+            }
+
+            if self.position.x > self_border {
+                self.velocity.x -= (self.position.x-self_border)*ABSORBTION;
+            }
+
+            else if self.position.x < -self_border {
+                self.velocity.x -= (self.position.x+self_border)*ABSORBTION;
+            }
         }
-
-        if self.position.y < -self_border {
-            self.velocity.y -= (self.position.y+self_border)*ABSORBTION;
-        }
-
-        if self.position.x > self_border {
-            self.velocity.x -= (self.position.x-self_border)*ABSORBTION;
-        }
-
-        else if self.position.x < -self_border {
-            self.velocity.x -= (self.position.x+self_border)*ABSORBTION;
-        }
-
-        
     }
 
     pub fn modify_velocity(&mut self, rhs: &Object) {

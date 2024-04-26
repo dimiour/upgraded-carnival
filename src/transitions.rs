@@ -36,7 +36,7 @@ impl Transition {
         }
     }
 
-    pub fn draw(&mut self, center: Vec2) -> bool {
+    pub fn draw(&mut self) -> bool {
         let time = get_time()-self.start_time;
 
         if time < TRANSITION_SPEED {
@@ -44,7 +44,7 @@ impl Transition {
                 TransitionClass::Release(release_position) => {
                     
                     let relative_position = release_position-self.position;
-                    let position = self.position+ui_position(center);
+                    let position = self.position+ui_position();
                     let release = relative_position*(1.0-half_arc(time/TRANSITION_SPEED))+position;
                     
                     draw_line(
@@ -61,7 +61,7 @@ impl Transition {
                 },
 
                 TransitionClass::Tap => {
-                    let position = self.position+ui_position(center);
+                    let position = self.position+ui_position();
                     draw_circle(position.x, position.y, arc(time/TRANSITION_SPEED)*0.03, BLUE)
                 },
             }

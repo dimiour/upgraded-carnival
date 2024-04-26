@@ -47,7 +47,7 @@ impl Game {
                     vec2(0.05*x as f32, 0.05*y as f32), 
                     vec2(0.0, 0.0), 
                     0.02, 
-                    10.0,
+                    100.0,
                     ObjectClass::Wall
                 ));
             }
