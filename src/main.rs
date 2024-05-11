@@ -60,8 +60,8 @@ async fn game(settings: GameSettings) {
 
         draw_centered_text(
             WEAPON_NAMES[weapon.id],
-            ui_position()+Vec2::splat(0.1), 
-            0.01, 
+            ui_position()+window_size()*vec2(0.5, 0.03),
+            0.03, 
             WHITE
         );
         
