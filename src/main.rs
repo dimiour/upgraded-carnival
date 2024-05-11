@@ -57,6 +57,13 @@ async fn game(settings: GameSettings) {
 
         //
         let weapon = if equipped {settings.loadout.0} else {settings.loadout.1};
+
+        draw_centered_text(
+            WEAPON_NAMES[weapon.id],
+            ui_position()+Vec2::splat(0.1), 
+            0.01, 
+            WHITE
+        );
         
         //draw control
         if is_mouse_button_pressed(MouseButton::Left) {

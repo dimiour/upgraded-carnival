@@ -1,5 +1,7 @@
 use crate::object::ObjectClass;
 
+pub const WEAPON_NAMES: [&str; 4] = ["Sniper", "Leap", "Multishot", "Buidling Tool"];
+
 pub const SNIPER: Weapon = Weapon {
     recoil_scale: 0.01, // scale depending on the stretch of the gun
     max_stretch: 0.05,
@@ -12,6 +14,7 @@ pub const SNIPER: Weapon = Weapon {
     spread_count: 1,
     angle_spread: 0.1,
     bullet_class: ObjectClass::Bullet,
+    id: 0,
 };
 
 pub const LEAP: Weapon = Weapon {
@@ -26,6 +29,7 @@ pub const LEAP: Weapon = Weapon {
     spread_count: 1,
     angle_spread: 0.0,
     bullet_class: ObjectClass::Bullet,
+    id: 1,
 };
 
 pub const ROCKET: Weapon = Weapon {
@@ -40,6 +44,7 @@ pub const ROCKET: Weapon = Weapon {
     spread_count: 3,
     angle_spread: 0.3,
     bullet_class: ObjectClass::Bullet,
+    id: 2,
 };
 
 pub const BUILDER: Weapon = Weapon {
@@ -54,6 +59,7 @@ pub const BUILDER: Weapon = Weapon {
     spread_count: 6,
     angle_spread: 0.6,
     bullet_class: ObjectClass::Wall,
+    id: 3,
 };
 
 #[derive(Copy, Clone)]
@@ -69,4 +75,5 @@ pub struct Weapon {
     pub spread_count: u8, // spread_count cant equal 0 or error will occur
     pub angle_spread: f32,
     pub bullet_class: ObjectClass,
+    pub id: usize,
 }
