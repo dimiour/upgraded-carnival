@@ -12,6 +12,8 @@ pub const TICK_LENGTH: f64 = 1.0/TPS;
 
 const OBJECT_FADE_SPEED: f64 = 0.25;
 
+const TEXTSIZE: f32 = 0.01;
+
 
 //GAME
 #[derive(Clone)]
@@ -128,13 +130,16 @@ impl Game {
                 },
 
                 class => {
-                    let mut color = match class {
-                        ObjectClass::Player => if object.id == self.player_id {BLUE} else {RED}
-                        _ => GRAY
+                    let (mut color, text) = match class {
+                        ObjectClass::Player => if object.id == self.player_id {(BLUE, "player")} else {(RED, "enemy")}
+                        _ => (GRAY, "wall")
                     };
+                    
                     draw_circle(object.position.x, object.position.y, object.size, fade_color(color, object.fade));
                     color.r -= 0.1;color.g -= 0.1;color.b -= 0.1;
-                    draw_circle(object.position.x, object.position.y, object.size*0.8, fade_color(color, object.fade))
+                    draw_circle(object.position.x, object.position.y, object.size*0.8, fade_color(color, object.fade));
+                    
+                    crate::draw_centered_text(text, object.position+vec2(0.0, object.size+TEXTSIZE), TEXTSIZE, WHITE);
                 },
             }
         }

@@ -44,10 +44,17 @@ pub fn set_window(center: Vec2) {
     }
 }
 
-/*pub fn print_stats(len: usize) {
-    if (get_time()/get_frame_time() as f64).floor()%200.0 == 0.0 {
-        //println!("objects: {}", len);
-        //println!("fps: {}", (1.0/get_frame_time()).floor());
-        //unsafe {get_scene()}
-    }
-}*/
+pub fn draw_centered_text(text: &str, center: Vec2, font_size: f32, color: Color) {
+    let font_scale = camera_font_scale(font_size);
+    let text_center = get_text_center(text, None, font_scale.0, font_scale.1, 0.0);
+    
+    let position = center-text_center;
+
+    draw_text_ex(text, position.x, position.y, TextParams{
+        font_size: font_scale.0, 
+        font_scale: font_scale.1, 
+        font_scale_aspect: font_scale.2, 
+        color, 
+        ..Default::default()
+    })
+}
